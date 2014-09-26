@@ -1,0 +1,7 @@
+bintray {
+    pkg {
+        name = "dropwizard-camel-core"
+        desc = "A library that supports using Apache Camel™ core in Dropwizard applications."
+        labels = ["dropwizard", "camel"]
+    }
+}
