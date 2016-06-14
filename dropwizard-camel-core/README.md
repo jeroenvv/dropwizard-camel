@@ -18,7 +18,7 @@ Gradle:
 
 ```groovy
 dependencies {
-    compile "com.commercehub.dropwizard:dropwizard-camel-core:1.0.0"
+    compile "com.commercehub.dropwizard:dropwizard-camel-core:VERSION"
 }
 ```
 
@@ -28,7 +28,7 @@ Maven:
 <dependency>
   <groupId>com.commercehub.dropwizard</groupId>
   <artifactId>dropwizard-camel-core</artifactId>
-  <version>1.0.0</version>
+  <version>VERSION</version>
 </dependency>
 ```
 
@@ -57,7 +57,7 @@ public class App extends Application<AppConfiguration> {
 
     @Override
     public void run(AppConfiguration config, Environment environment) {
-        CamelContext camelContext = ...
+        CamelContext camelContext = ...;
         HealthCheck camelHealthCheck = new CamelHealthCheck(camelContext);
         environment.healthChecks().register("camel", camelHealthCheck);
     }

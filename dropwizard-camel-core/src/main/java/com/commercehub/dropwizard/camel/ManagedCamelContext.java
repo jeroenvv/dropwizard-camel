@@ -23,6 +23,8 @@ import org.apache.camel.ConsumerTemplate;
 import org.apache.camel.Endpoint;
 import org.apache.camel.ErrorHandlerFactory;
 import org.apache.camel.NoFactoryAvailableException;
+import org.apache.camel.PollingConsumer;
+import org.apache.camel.Processor;
 import org.apache.camel.Producer;
 import org.apache.camel.ProducerTemplate;
 import org.apache.camel.Route;
@@ -32,16 +34,23 @@ import org.apache.camel.ShutdownRoute;
 import org.apache.camel.ShutdownRunningTask;
 import org.apache.camel.StartupListener;
 import org.apache.camel.TypeConverter;
+import org.apache.camel.api.management.mbean.ManagedCamelContextMBean;
+import org.apache.camel.api.management.mbean.ManagedProcessorMBean;
+import org.apache.camel.api.management.mbean.ManagedRouteMBean;
 import org.apache.camel.builder.ErrorHandlerBuilder;
 import org.apache.camel.model.DataFormatDefinition;
+import org.apache.camel.model.ProcessorDefinition;
 import org.apache.camel.model.RouteDefinition;
 import org.apache.camel.model.RoutesDefinition;
 import org.apache.camel.model.rest.RestDefinition;
+import org.apache.camel.model.rest.RestsDefinition;
+import org.apache.camel.spi.AsyncProcessorAwaitManager;
 import org.apache.camel.spi.CamelContextNameStrategy;
 import org.apache.camel.spi.ClassResolver;
 import org.apache.camel.spi.DataFormat;
 import org.apache.camel.spi.DataFormatResolver;
 import org.apache.camel.spi.Debugger;
+import org.apache.camel.spi.EndpointRegistry;
 import org.apache.camel.spi.EndpointStrategy;
 import org.apache.camel.spi.ExecutorServiceManager;
 import org.apache.camel.spi.ExecutorServiceStrategy;
@@ -55,6 +64,8 @@ import org.apache.camel.spi.LifecycleStrategy;
 import org.apache.camel.spi.ManagementMBeanAssembler;
 import org.apache.camel.spi.ManagementNameStrategy;
 import org.apache.camel.spi.ManagementStrategy;
+import org.apache.camel.spi.MessageHistoryFactory;
+import org.apache.camel.spi.ModelJAXBContextFactory;
 import org.apache.camel.spi.NodeIdFactory;
 import org.apache.camel.spi.PackageScanClassResolver;
 import org.apache.camel.spi.ProcessorFactory;
@@ -203,6 +214,11 @@ public class ManagedCamelContext implements CamelContext, Managed {
     }
 
     @Override
+    public <T extends CamelContext> T adapt(Class<T> type) {
+        return context.adapt(type);
+    }
+
+    @Override
     public void start() throws Exception {
         LOGGER.info("Starting");
         context.start();
@@ -287,6 +303,11 @@ public class ManagedCamelContext implements CamelContext, Managed {
     }
 
     @Override
+    public void deferStartService(Object object, boolean stopOnShutdown) throws Exception {
+        context.deferStartService(object, stopOnShutdown);
+    }
+
+    @Override
     public void addStartupListener(StartupListener listener) throws Exception {
         context.addStartupListener(listener);
     }
@@ -327,6 +348,11 @@ public class ManagedCamelContext implements CamelContext, Managed {
     }
 
     @Override
+    public EndpointRegistry<String> getEndpointRegistry() {
+        return context.getEndpointRegistry();
+    }
+
+    @Override
     public Endpoint getEndpoint(String uri) {
         return context.getEndpoint(uri);
     }
@@ -354,6 +380,11 @@ public class ManagedCamelContext implements CamelContext, Managed {
     @Override
     public Endpoint addEndpoint(String uri, Endpoint endpoint) throws Exception {
         return context.addEndpoint(uri, endpoint);
+    }
+
+    @Override
+    public void removeEndpoint(Endpoint endpoint) throws Exception {
+        context.removeEndpoint(endpoint);
     }
 
     @Override
@@ -406,6 +437,21 @@ public class ManagedCamelContext implements CamelContext, Managed {
     }
 
     @Override
+    public void addRestConfiguration(RestConfiguration restConfiguration) {
+        context.addRestConfiguration(restConfiguration);
+    }
+
+    @Override
+    public RestConfiguration getRestConfiguration(String component, boolean defaultIfNotFound) {
+        return context.getRestConfiguration(component, defaultIfNotFound);
+    }
+
+    @Override
+    public Collection<RestConfiguration> getRestConfigurations() {
+        return context.getRestConfigurations();
+    }
+
+    @Override
     public List<RouteStartupOrder> getRouteStartupOrder() {
         return context.getRouteStartupOrder();
     }
@@ -421,6 +467,41 @@ public class ManagedCamelContext implements CamelContext, Managed {
     }
 
     @Override
+    public Processor getProcessor(String id) {
+        return context.getProcessor(id);
+    }
+
+    @Override
+    public <T extends Processor> T getProcessor(String id, Class<T> type) {
+        return context.getProcessor(id, type);
+    }
+
+    @Override
+    public <T extends ManagedProcessorMBean> T getManagedProcessor(String id, Class<T> type) {
+        return context.getManagedProcessor(id, type);
+    }
+
+    @Override
+    public <T extends ManagedRouteMBean> T getManagedRoute(String routeId, Class<T> type) {
+        return context.getManagedRoute(routeId, type);
+    }
+
+    @Override
+    public ManagedCamelContextMBean getManagedCamelContext() {
+        return context.getManagedCamelContext();
+    }
+
+    @Override
+    public ProcessorDefinition getProcessorDefinition(String id) {
+        return context.getProcessorDefinition(id);
+    }
+
+    @Override
+    public <T extends ProcessorDefinition> T getProcessorDefinition(String id, Class<T> type) {
+        return context.getProcessorDefinition(id, type);
+    }
+
+    @Override
     public void addRoutes(RoutesBuilder builder) throws Exception {
         context.addRoutes(builder);
     }
@@ -429,6 +510,11 @@ public class ManagedCamelContext implements CamelContext, Managed {
     @Deprecated
     public RoutesDefinition loadRoutesDefinition(InputStream is) throws Exception {
         return context.loadRoutesDefinition(is);
+    }
+
+    @Override
+    public RestsDefinition loadRestsDefinition(InputStream is) throws Exception {
+        return context.loadRestsDefinition(is);
     }
 
     @Override
@@ -744,6 +830,16 @@ public class ManagedCamelContext implements CamelContext, Managed {
     }
 
     @Override
+    public void setPollingConsumerServicePool(ServicePool<Endpoint, PollingConsumer> servicePool) {
+        context.setPollingConsumerServicePool(servicePool);
+    }
+
+    @Override
+    public ServicePool<Endpoint, PollingConsumer> getPollingConsumerServicePool() {
+        return context.getPollingConsumerServicePool();
+    }
+
+    @Override
     public void setNodeIdFactory(NodeIdFactory factory) {
         context.setNodeIdFactory(factory);
     }
@@ -809,6 +905,16 @@ public class ManagedCamelContext implements CamelContext, Managed {
     }
 
     @Override
+    public AsyncProcessorAwaitManager getAsyncProcessorAwaitManager() {
+        return context.getAsyncProcessorAwaitManager();
+    }
+
+    @Override
+    public void setAsyncProcessorAwaitManager(AsyncProcessorAwaitManager manager) {
+        context.setAsyncProcessorAwaitManager(manager);
+    }
+
+    @Override
     public ClassLoader getApplicationContextClassLoader() {
         return context.getApplicationContextClassLoader();
     }
@@ -852,6 +958,16 @@ public class ManagedCamelContext implements CamelContext, Managed {
     @Override
     public void setProcessorFactory(ProcessorFactory processorFactory) {
         context.setProcessorFactory(processorFactory);
+    }
+
+    @Override
+    public MessageHistoryFactory getMessageHistoryFactory() {
+        return context.getMessageHistoryFactory();
+    }
+
+    @Override
+    public void setMessageHistoryFactory(MessageHistoryFactory messageHistoryFactory) {
+        context.setMessageHistoryFactory(messageHistoryFactory);
     }
 
     @Override
@@ -917,13 +1033,63 @@ public class ManagedCamelContext implements CamelContext, Managed {
     }
 
     @Override
+    public String resolveComponentDefaultName(String javaType) {
+        return context.resolveComponentDefaultName(javaType);
+    }
+
+    @Override
     public Map<String, Properties> findComponents() throws LoadPropertiesException, IOException {
         return context.findComponents();
     }
 
     @Override
+    public Map<String, Properties> findEips() throws LoadPropertiesException, IOException {
+        return context.findEips();
+    }
+
+    @Override
     public String getComponentDocumentation(String componentName) throws IOException {
         return context.getComponentDocumentation(componentName);
+    }
+
+    @Override
+    public String getComponentParameterJsonSchema(String componentName) throws IOException {
+        return context.getComponentParameterJsonSchema(componentName);
+    }
+
+    @Override
+    public String getDataFormatParameterJsonSchema(String dataFormatName) throws IOException {
+        return context.getDataFormatParameterJsonSchema(dataFormatName);
+    }
+
+    @Override
+    public String getLanguageParameterJsonSchema(String languageName) throws IOException {
+        return context.getLanguageParameterJsonSchema(languageName);
+    }
+
+    @Override
+    public String getEipParameterJsonSchema(String eipName) throws IOException {
+        return context.getEipParameterJsonSchema(eipName);
+    }
+
+    @Override
+    public String explainEipJson(String nameOrId, boolean includeAllOptions) {
+        return context.explainEipJson(nameOrId, includeAllOptions);
+    }
+
+    @Override
+    public String explainComponentJson(String componentName, boolean includeAllOptions) {
+        return context.explainComponentJson(componentName, includeAllOptions);
+    }
+
+    @Override
+    public String explainDataFormatJson(String dataFormatName, DataFormat dataFormat, boolean includeAllOptions) {
+        return context.explainDataFormatJson(dataFormatName, dataFormat, includeAllOptions);
+    }
+
+    @Override
+    public String explainEndpointJson(String uri, boolean includeAllOptions) {
+        return context.explainEndpointJson(uri, includeAllOptions);
     }
 
     @Override
@@ -986,5 +1152,14 @@ public class ManagedCamelContext implements CamelContext, Managed {
         return context.getRoutePolicyFactories();
     }
 
-}
+    @Override
+    public ModelJAXBContextFactory getModelJAXBContextFactory() {
+        return context.getModelJAXBContextFactory();
+    }
 
+    @Override
+    public void setModelJAXBContextFactory(ModelJAXBContextFactory modelJAXBContextFactory) {
+        context.setModelJAXBContextFactory(modelJAXBContextFactory);
+    }
+
+}
