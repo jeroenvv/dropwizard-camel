@@ -82,7 +82,7 @@ subprojects {
     }
 
     group = "com.commercehub.dropwizard"
-    sourceCompatibility = "1.7"
+    sourceCompatibility = "1.8"
 
     apply plugin: "net.researchgate.release"
     apply plugin: "com.jfrog.bintray"

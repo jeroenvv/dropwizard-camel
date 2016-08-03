@@ -278,6 +278,11 @@ public class ManagedCamelContext implements CamelContext, Managed {
     }
 
     @Override
+    public long getUptimeMillis() {
+        return context.getUptimeMillis();
+    }
+
+    @Override
     public void addService(Object object) throws Exception {
         context.addService(object);
     }
