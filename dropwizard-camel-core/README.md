@@ -7,10 +7,10 @@
 A library that supports using [Apache Camel™](http://camel.apache.org/) core in
 [Dropwizard](http://dropwizard.io/) applications.
 
-Currently, it includes a [Managed](http://dropwizard.io/manual/core.html#managed-objects)
+Currently, it includes a [Managed](http://www.dropwizard.io/1.0.0/docs/manual/core.html#managed-objects)
 [CamelContext](http://camel.apache.org/camelcontext.html), a Managed
 [ProducerTemplate](http://camel.apache.org/producertemplate.html), and a
-[health check](http://dropwizard.io/manual/core.html#health-checks).
+[health check](http://www.dropwizard.io/1.0.0/docs/manual/core.html#health-checks).
 
 # Usage
 
