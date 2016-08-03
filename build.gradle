@@ -3,21 +3,17 @@ buildscript {
         jcenter()
     }
     dependencies {
-        classpath "com.github.townsfolk:gradle-release:1.2"
-        classpath "com.jfrog.bintray.gradle:gradle-bintray-plugin:0.5"
+        classpath "net.researchgate:gradle-release:2.4.0"
+        classpath "com.jfrog.bintray.gradle:gradle-bintray-plugin:1.7"
     }
 }
-
-apply plugin: "release"
 
 subprojects {
     apply plugin: "java"
     apply plugin: "groovy"
+    apply plugin: "jacoco"
     apply plugin: "maven"
     apply plugin: "maven-publish"
-
-    group = "com.commercehub.dropwizard"
-    sourceCompatibility = "1.7"
 
     repositories {
         jcenter()
@@ -26,7 +22,21 @@ subprojects {
     dependencies {
         compile "io.dropwizard:dropwizard-core:${dropwizardVersion}"
         compile "org.apache.camel:camel-core:${camelVersion}"
-        testCompile "org.spockframework:spock-core:0.7-groovy-2.0"
+        testCompile "org.spockframework:spock-core:1.0-groovy-2.4"
+    }
+
+    jacocoTestReport {
+        reports {
+            xml.enabled true
+        }
+    }
+
+    check.dependsOn jacocoTestReport
+
+    test {
+        testLogging {
+            exceptionFormat = 'full'
+        }
     }
 
     task sourcesJar(type: Jar, dependsOn: classes) {
@@ -39,6 +49,10 @@ subprojects {
         from javadoc.destinationDir
         classifier "javadoc"
         extension "jar"
+    }
+
+    artifacts {
+        archives sourcesJar, javadocJar
     }
 
     publishing {
@@ -67,7 +81,17 @@ subprojects {
         }
     }
 
+    group = "com.commercehub.dropwizard"
+    sourceCompatibility = "1.7"
+
+    apply plugin: "net.researchgate.release"
     apply plugin: "com.jfrog.bintray"
+
+    release {
+        git {
+            requireBranch = ''
+        }
+    }
 
     bintray {
         user = project.hasProperty("bintrayUserName") ? bintrayUserName : null

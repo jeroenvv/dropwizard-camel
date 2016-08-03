@@ -1,4 +1,8 @@
-# Overview
+# dropwizard-camel-core
+
+[![Build Status](https://travis-ci.org/commercehub-oss/dropwizard-camel.svg?branch=master)](https://travis-ci.org/commercehub-oss/dropwizard-camel)
+[![Code Coverage](https://img.shields.io/codecov/c/github/commercehub-oss/dropwizard-camel.svg)](https://codecov.io/gh/commercehub-oss/dropwizard-camel)
+[![Download](https://api.bintray.com/packages/commercehub-oss/main/dropwizard-camel-core/images/download.svg)](https://bintray.com/commercehub-oss/main/dropwizard-camel-core/_latestVersion)
 
 A library that supports using [Apache Camel™](http://camel.apache.org/) core in
 [Dropwizard](http://dropwizard.io/) applications.
@@ -7,7 +11,6 @@ Currently, it includes a [Managed](http://dropwizard.io/manual/core.html#managed
 [CamelContext](http://camel.apache.org/camelcontext.html), a Managed
 [ProducerTemplate](http://camel.apache.org/producertemplate.html), and a
 [health check](http://dropwizard.io/manual/core.html#health-checks).
-
 
 # Usage
 
@@ -66,6 +69,7 @@ public class App extends Application<AppConfiguration> {
 ```
 
 # License
+
 This library is available under the [Apache License, Version 2.0](http://www.apache.org/licenses/LICENSE-2.0).
 
-(c) All rights reserved Commerce Technologies, Inc.
+(c) All rights reserved Commerce Technologies, LLC
