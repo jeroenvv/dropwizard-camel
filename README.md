@@ -13,4 +13,4 @@ See the README of each library for its usage instructions.
 # License
 This library is available under the [Apache License, Version 2.0](http://www.apache.org/licenses/LICENSE-2.0).
 
-(c) All rights reserved Commerce Technologies, LLC
+Copyright © 2014-2016 Commerce Technologies, LLC
