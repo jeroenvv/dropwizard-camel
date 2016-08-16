@@ -19,9 +19,10 @@ subprojects {
         jcenter()
     }
 
+    ext.dropwizardVersion = dropwizardVersion
+    ext.camelVersion = camelVersion
+
     dependencies {
-        compile "io.dropwizard:dropwizard-core:${dropwizardVersion}"
-        compile "org.apache.camel:camel-core:${camelVersion}"
         testCompile "org.spockframework:spock-core:1.0-groovy-2.4"
     }
 

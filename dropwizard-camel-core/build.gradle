@@ -5,3 +5,9 @@ bintray {
         labels = ["dropwizard", "camel"]
     }
 }
+
+
+dependencies {
+    compile "io.dropwizard:dropwizard-core:${dropwizardVersion}"
+    compile "org.apache.camel:camel-core:${camelVersion}"
+}

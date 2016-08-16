@@ -1,0 +1,15 @@
+bintray {
+    pkg {
+        name = "dropwizard-camel-jms"
+        desc = "A library that supports using Apache Camel™ JMS component in Dropwizard applications."
+        labels = ["dropwizard", "camel", "jms"]
+    }
+}
+
+dependencies {
+    compile project(":dropwizard-camel-core")
+    compile "io.dropwizard:dropwizard-validation:${dropwizardVersion}"
+    compile "org.apache.camel:camel-jms:${camelVersion}"
+    compile 'org.apache.geronimo.specs:geronimo-jms_1.1_spec:1.1.1'
+    testCompile 'cglib:cglib-nodep:3.2.4'
+}
