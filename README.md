@@ -1,3 +1,7 @@
+# THIS PROJECT IS DEPRECATED
+dropwizard-camel is no longer maintained, and this repository will be removed from GitHub on or after April 24, 2018. Published release artifacts will continue to be available indefinitely via
+[Bintray JCenter](https://bintray.com/commercehub-oss/main/dropwizard-camel-core).
+
 # dropwizard-camel
 
 [![Build Status](https://travis-ci.org/commercehub-oss/dropwizard-camel.svg?branch=master)](https://travis-ci.org/commercehub-oss/dropwizard-camel)
